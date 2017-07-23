@@ -1,11 +1,13 @@
-# ECMAScript 6 <sup>[git.io/es6features](http://git.io/es6features)</sup>
+# ECMAScript 6
 
-## Introduction
-ECMAScript 6, also known as ECMAScript 2015, is the latest version of the ECMAScript standard.  ES6 is a significant update to the language, and the first update to the language since ES5 was standardized in 2009. Implementation of these features in major JavaScript engines is [underway now](http://kangax.github.io/es5-compat-table/es6/).
+翻译自 [https://github.com/lukehoban/es6features](https://github.com/lukehoban/es6features)
 
-See the [ES6 standard](http://www.ecma-international.org/ecma-262/6.0/) for full specification of the ECMAScript 6 language.
+## 简介
+ECMAScript 6，也被称为 ECMAScript 2015，是 ECMAScript 标准的最新版本。ES6 是该语言的一次重大更新，同时也是 ES5 在 2009 年被标准化以来的首次更新。主要的 JavaScript 引擎对这些特性的实现正在[进行中](http://kangax.github.io/es5-compat-table/es6/)。
 
-ES6 includes the following new features:
+点击 [ES6 标准](http://www.ecma-international.org/ecma-262/6.0/) 以查看 ECMAScript 6 的完整描述。
+
+ES6 包含了如下新特性：
 - [arrows](#arrows)
 - [classes](#classes)
 - [enhanced object literals](#enhanced-object-literals)
@@ -28,87 +30,96 @@ ES6 includes the following new features:
 - [reflect api](#reflect-api)
 - [tail calls](#tail-calls)
 
-## ECMAScript 6 Features
+## ECMAScript 6 特性
 
-### Arrows
-Arrows are a function shorthand using the `=>` syntax.  They are syntactically similar to the related feature in C#, Java 8 and CoffeeScript.  They support both statement block bodies as well as expression bodies which return the value of the expression.  Unlike functions, arrows share the same lexical `this` as their surrounding code.
+### 箭头函数
+箭头函数是使用 `=>` 语法表示的一个函数，这和 C#，Java 8 以及 CoffeeScript 的相关特性在语法上类似。箭头函数既支持语句块，也支持表达式。与普通函数不同的是，箭头函数中的 `this` 始终指向函数定义时所在的对象，而非函数使用时所在的对象。
 
 ```JavaScript
-// Expression bodies
-var odds = evens.map(v => v + 1);
-var nums = evens.map((v, i) => v + i);
-var pairs = evens.map(v => ({even: v, odd: v + 1}));
+// 表达式
+const odds = evens.map(v => v + 1);
+const nums = evens.map((v, i) => v + i);
+const pairs = evens.map(v => ({even: v, odd: v + 1}));
 
-// Statement bodies
+// 语句块
 nums.forEach(v => {
-  if (v % 5 === 0)
-    fives.push(v);
+    if (v % 5 === 0) {
+        fives.push(v);
+    }
 });
 
-// Lexical this
+// 箭头函数中的this
 var bob = {
-  _name: "Bob",
-  _friends: [],
-  printFriends() {
-    this._friends.forEach(f =>
-      console.log(this._name + " knows " + f));
-  }
+    _name: 'Bob',
+    _friends: ['Tom', 'Kathy'],
+    printFriends() {
+        this._friends.forEach(f => {
+            console.log(`${this._name} knows ${f}`);
+        });
+    }
 }
 ```
 
-More info: [MDN Arrow Functions](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Functions/Arrow_functions)
+> 更多信息：[MDN 箭头函数](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/Arrow_functions)
 
-### Classes
-ES6 classes are a simple sugar over the prototype-based OO pattern.  Having a single convenient declarative form makes class patterns easier to use, and encourages interoperability.  Classes support prototype-based inheritance, super calls, instance and static methods and constructors.
+### 类
+ES6 的类是现有的基于原型面向对象模式的一个简单的语法糖。简单且方便的声明形式使得类模式更易于使用，并鼓励互操作性。类支持基于原型的继承、超类调用、原型方法、静态方法、访问器等。
 
 ```JavaScript
 class SkinnedMesh extends THREE.Mesh {
-  constructor(geometry, materials) {
-    super(geometry, materials);
+    constructor(geometry, materials) {
+        super(geometry, materials);
 
-    this.idMatrix = SkinnedMesh.defaultMatrix();
-    this.bones = [];
-    this.boneMatrices = [];
-    //...
-  }
-  update(camera) {
-    //...
-    super.update();
-  }
-  get boneCount() {
-    return this.bones.length;
-  }
-  set matrixType(matrixType) {
-    this.idMatrix = SkinnedMesh[matrixType]();
-  }
-  static defaultMatrix() {
-    return new THREE.Matrix4();
-  }
+        this.idMatrix = SkinnedMesh.defaultMatrix();
+        this.bones = [];
+        this.boneMatrices = [];
+        // ...
+    }
+
+    update(camera) {
+        // ...
+        super.update();
+    }
+
+    get boneCount() {
+        return this.bones.length;
+    }
+
+    set matrixType(matrixType) {
+        this.idMatrix = SkinnedMesh[matrixType]();
+    }
+
+    static defaultMatrix() {
+        return new THREE.Matrix4();
+    }
 }
 ```
 
-More info: [MDN Classes](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Classes)
+> 更多信息：[MDN 类](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Classes)
 
-### Enhanced Object Literals
-Object literals are extended to support setting the prototype at construction, shorthand for `foo: foo` assignments, defining methods, making super calls, and computing property names with expressions.  Together, these also bring object literals and class declarations closer together, and let object-based design benefit from some of the same conveniences.
+### 增强的对象字面量
+在 ES2015，对象字面量扩展支持在创建对象时设置原型，简写 `foo: foo`，简写方法的定义，加工父函数（super calls），动态计算的属性名。总之，这些增强使得对象字面量和类声明紧密联系起来，让基于对象的设计更加便利。
 
 ```JavaScript
 var obj = {
-    // __proto__
+    // 设置原型
     __proto__: theProtoObj,
-    // Shorthand for ‘handler: handler’
+
+    // 'handler: handler'的简写
     handler,
-    // Methods
+
+    // 简写的方法定义
     toString() {
-     // Super calls
-     return "d " + super.toString();
+        // 加工父函数
+        return "d " + super.toString();
     },
-    // Computed (dynamic) property names
+
+    // 动态计算的属性名
     [ 'prop_' + (() => 42)() ]: 42
 };
 ```
 
-More info: [MDN Grammar and types: Object literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Grammar_and_types#Object_literals)
+> 更多信息：[MDN 语法和数据类型：对象字面量](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Grammar_and_types#对象字面量_(Object_literals))
 
 ### Template Strings
 Template strings provide syntactic sugar for constructing strings.  This is similar to string interpolation features in Perl, Python and more.  Optionally, a tag can be added to allow the string construction to be customized, avoiding injection attacks or constructing higher level data structures from string contents.
