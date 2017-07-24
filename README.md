@@ -3,9 +3,9 @@
 翻译自 [https://github.com/lukehoban/es6features](https://github.com/lukehoban/es6features)
 
 ## 简介
-ECMAScript 6，也被称为 ECMAScript 2015，是 ECMAScript 标准的最新版本。ES6 是该语言的一次重大更新，同时也是 ES5 在 2009 年被标准化以来的首次更新。主要的 JavaScript 引擎对这些特性的实现正在[进行中](http://kangax.github.io/es5-compat-table/es6/)。
+ECMAScript 6，也被称为 ECMAScript 2015，是 ECMAScript 标准的最新版本。ES6 是 JavaScript 语言的重大革新，同时也是 ES5 在 2009 年被标准化以来的首次更新。主要的 JavaScript 引擎对这些特性的实现正在[进行中](http://kangax.github.io/es5-compat-table/es6/)。
 
-点击 [ES6 标准](http://www.ecma-international.org/ecma-262/6.0/) 以查看 ECMAScript 6 的完整描述。
+点击 [ES6 标准](http://www.ecma-international.org/ecma-262/6.0/) 以查看 ECMAScript 6 的完整说明。
 
 ES6 包含了如下新特性：
 - [arrows](#arrows)
@@ -33,7 +33,7 @@ ES6 包含了如下新特性：
 ## ECMAScript 6 特性
 
 ### 箭头函数
-箭头函数是使用 `=>` 语法表示的一个函数，这和 C#，Java 8 以及 CoffeeScript 的相关特性在语法上类似。箭头函数既支持语句块，也支持表达式。与普通函数不同的是，箭头函数中的 `this` 始终指向函数定义时所在的对象，而非函数使用时所在的对象。
+箭头函数是使用 `=>` 语法简写的函数，这在语法上和 C#，Java 8 以及 CoffeeScript 的相关特性类似。箭头函数既支持语句块，也支持表达式。与普通函数不同的是，箭头函数中的 `this` 始终指向函数定义时所在的对象，而非函数执行时所在的对象。
 
 ```JavaScript
 // 表达式
@@ -54,6 +54,7 @@ var bob = {
     _friends: ['Tom', 'Kathy'],
     printFriends() {
         this._friends.forEach(f => {
+            // 此处的this指向bob，而非window
             console.log(`${this._name} knows ${f}`);
         });
     }
@@ -63,11 +64,14 @@ var bob = {
 > 更多信息：[MDN 箭头函数](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/Arrow_functions)
 
 ### 类
-ES6 的类是现有的基于原型面向对象模式的一个简单的语法糖。简单且方便的声明形式使得类模式更易于使用，并鼓励互操作性。类支持基于原型的继承、超类调用、原型方法、静态方法、访问器等。
+ES6 的类是现有的基于原型的面向对象模式的一个简单的语法糖。简单且方便的声明形式使得类模式更易于使用，并鼓励互操作性。类支持基于原型的继承、父类调用、实例方法、静态方法、构造函数等。
 
 ```JavaScript
+// 定义一个继承自THREE.Mesh的类
 class SkinnedMesh extends THREE.Mesh {
+    // 类的构造函数
     constructor(geometry, materials) {
+        // 调用父类构造函数
         super(geometry, materials);
 
         this.idMatrix = SkinnedMesh.defaultMatrix();
@@ -76,19 +80,23 @@ class SkinnedMesh extends THREE.Mesh {
         // ...
     }
 
+    // 普通（实例）方法，通过 new SkinnedMesh().update 调用
     update(camera) {
         // ...
         super.update();
     }
 
+    // get访问器
     get boneCount() {
         return this.bones.length;
     }
 
+    // set访问器
     set matrixType(matrixType) {
         this.idMatrix = SkinnedMesh[matrixType]();
     }
 
+    // 静态方法，直接通过 SkinnedMesh.defaultMatrix 调用
     static defaultMatrix() {
         return new THREE.Matrix4();
     }
@@ -98,7 +106,7 @@ class SkinnedMesh extends THREE.Mesh {
 > 更多信息：[MDN 类](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Classes)
 
 ### 增强的对象字面量
-在 ES2015，对象字面量扩展支持在创建对象时设置原型，简写 `foo: foo`，简写方法的定义，加工父函数（super calls），动态计算的属性名。总之，这些增强使得对象字面量和类声明紧密联系起来，让基于对象的设计更加便利。
+在 ES2015，对象字面量被扩展到支持在创建对象时设置原型，简写 `foo: foo` 赋值，简写方法的定义，调用父函数，动态计算的属性名。这些增强使得对象字面量和类声明紧密联系起来，让基于对象的设计也在这种便利中收益。
 
 ```JavaScript
 var obj = {
@@ -108,9 +116,9 @@ var obj = {
     // 'handler: handler'的简写
     handler,
 
-    // 简写的方法定义
+    // 简写的方法定义，省略了function
     toString() {
-        // 加工父函数
+        // 调用父函数
         return "d " + super.toString();
     },
 
@@ -121,22 +129,22 @@ var obj = {
 
 > 更多信息：[MDN 语法和数据类型：对象字面量](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Grammar_and_types#对象字面量_(Object_literals))
 
-### Template Strings
-Template strings provide syntactic sugar for constructing strings.  This is similar to string interpolation features in Perl, Python and more.  Optionally, a tag can be added to allow the string construction to be customized, avoiding injection attacks or constructing higher level data structures from string contents.
+### 模板字符串
+模板字符串提供了构建字符串的语法糖。这类似于 Perl，Python 等语言中的字符串插值特性。作为可选项，你还可以加入标签来自定义字符串的构建，这可以避免注入攻击，或者从字符串内容构建高阶数据结构。
 
 ```JavaScript
-// Basic literal string creation
+// 基本的模板字符串
 `In JavaScript '\n' is a line-feed.`
 
-// Multiline strings
+// 多行字符串
 `In JavaScript this is
  not legal.`
 
-// String interpolation
+// 字符串插值
 var name = "Bob", time = "today";
 `Hello ${name}, how are you ${time}?`
 
-// Construct an HTTP request prefix is used to interpret the replacements and construction
+// 构建一个HTTP请求，其中标签POST是一个自定义的函数，用来进行替换和构建
 POST`http://foo.org/bar?a=${a}&b=${b}
      Content-Type: application/json
      X-Credentials: ${credentials}
@@ -144,66 +152,65 @@ POST`http://foo.org/bar?a=${a}&b=${b}
        "bar": ${bar}}`(myOnReadyStateChangeHandler);
 ```
 
-More info: [MDN Template Strings](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/template_strings)
+> 更多信息：[MDN 模板字符串](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/template_strings)
 
-### Destructuring
-Destructuring allows binding using pattern matching, with support for matching arrays and objects.  Destructuring is fail-soft, similar to standard object lookup `foo["bar"]`, producing `undefined` values when not found.
+### 解构
+解构使用模式匹配进行绑定，支持匹配数组和对象。解构具有良好的容错性，类似于标准对象的查询 `foo['bar']`，如果找不到则返回 `undefined` 。
 
 ```JavaScript
-// list matching
-var [a, , b] = [1,2,3];
+// 数组匹配
+var [a, , b] = [1, 2, 3];
 
-// object matching
-var { op: a, lhs: { op: b }, rhs: c }
-       = getASTNode()
+// 对象匹配
+var {op: a, lhs: {op: b}, rhs: c} = getASTNode();
 
-// object matching shorthand
-// binds `op`, `lhs` and `rhs` in scope
-var {op, lhs, rhs} = getASTNode()
+// 对象匹配的简写
+// 绑定 `op`, `lhs` and `rhs` 到作用域
+var {op, lhs, rhs} = getASTNode();
 
-// Can be used in parameter position
+// 可以被用在参数位置
 function g({name: x}) {
-  console.log(x);
+    console.log(x);
 }
-g({name: 5})
+g({name: 5});
 
-// Fail-soft destructuring
+// 解构的容错性
 var [a] = [];
 a === undefined;
 
-// Fail-soft destructuring with defaults
+// 带默认值时的容错性
 var [a = 1] = [];
 a === 1;
 ```
 
-More info: [MDN Destructuring assignment](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment)
+> 更多信息：[MDN 解构赋值](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment)
 
-### Default + Rest + Spread
-Callee-evaluated default parameter values.  Turn an array into consecutive arguments in a function call.  Bind trailing parameters to an array.  Rest replaces the need for `arguments` and addresses common cases more directly.
+### 默认参数、剩余参数和扩展参数
+函数可以设置参数的默认值。调用函数时可以传入一个扩展参数，这将被视为连续的参数形式。函数尾部的剩余参数会被绑定到一个数组，它取代了 `arguments` 的功能，可以更直接地处理常见情况。
 
 ```JavaScript
-function f(x, y=12) {
-  // y is 12 if not passed (or passed as undefined)
-  return x + y;
+function f(x, y = 12) {
+    // y 将被赋值为 12 如果没有传值（或者传值为 undefined）
+    return x + y;
 }
 f(3) == 15
 ```
 ```JavaScript
 function f(x, ...y) {
-  // y is an Array
-  return x * y.length;
+   // y 是一个数组
+   return x * y.length;
 }
 f(3, "hello", true) == 6
 ```
 ```JavaScript
 function f(x, y, z) {
-  return x + y + z;
+    return x + y + z;
 }
-// Pass each elem of array as argument
+// 将数组的每一个元素作为连续参数传入方法 f
 f(...[1,2,3]) == 6
 ```
 
-More MDN info: [Default parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Default_parameters), [Rest parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters), [Spread Operator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator)
+> 更多信息：[MDN 默认参数](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/Default_parameters)，[MDN 剩余参数](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/rest_parameters)，[MDN 扩展参数](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Spread_operator)
 
 ### Let + Const
 Block-scoped binding constructs.  `let` is the new `var`.  `const` is single-assignment.  Static restrictions prevent use before assignment.
