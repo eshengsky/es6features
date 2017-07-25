@@ -197,8 +197,8 @@ f(3) == 15
 ```
 ```JavaScript
 function f(x, ...y) {
-   // y 是一个数组
-   return x * y.length;
+    // y 是一个数组
+    return x * y.length;
 }
 f(3, "hello", true) == 6
 ```
@@ -206,73 +206,72 @@ f(3, "hello", true) == 6
 function f(x, y, z) {
     return x + y + z;
 }
-// 将数组的每一个元素作为连续参数传入方法 f
+// 将数组的每一个元素作为连续参数传入方法f
 f(...[1,2,3]) == 6
 ```
 
 > 更多信息：[MDN 默认参数](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/Default_parameters)，[MDN 剩余参数](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/rest_parameters)，[MDN 扩展参数](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Spread_operator)
 
-### Let + Const
-Block-scoped binding constructs.  `let` is the new `var`.  `const` is single-assignment.  Static restrictions prevent use before assignment.
-
+### Let 和 Const
+两者都用来声明块级作用域的变量。`let` 是新的 `var`，`const` 是单次赋值，且必须在赋值之后才能使用。
 
 ```JavaScript
 function f() {
-  {
-    let x;
     {
-      // okay, block scoped name
-      const x = "sneaky";
-      // error, const
-      x = "foo";
+        let x;
+        {
+            // 块级作用域
+            const x = "sneaky";
+            // 错误，不允许再次赋值
+            x = "foo";
+        }
+        // 错误，在当前作用域下已有定义
+        let x = "inner";
     }
-    // error, already declared in block
-    let x = "inner";
-  }
 }
 ```
 
-More MDN info: [let statement](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let), [const statement](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const)
+更多信息：[MDN let 语句](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/let)，[MDN const 语句](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/const)
 
-### Iterators + For..Of
-Iterator objects enable custom iteration like CLR IEnumerable or Java Iterable.  Generalize `for..in` to custom iterator-based iteration with `for..of`.  Don’t require realizing an array, enabling lazy design patterns like LINQ.
+### 迭代器
+迭代器对象让 JavaScript 能够像 CLR 的 IEnumerable 接口或 Java 的 Iterable 接口一样进行自定义迭代。通常我们将 `for..in` 转换成自定义的基于迭代器的 `for..of` 迭代。不需要实现一个像 LINQ 那样的惰性设计模式的数组。
 
 ```JavaScript
 let fibonacci = {
-  [Symbol.iterator]() {
-    let pre = 0, cur = 1;
-    return {
-      next() {
-        [pre, cur] = [cur, pre + cur];
-        return { done: false, value: cur }
-      }
+    [Symbol.iterator]() {
+        let pre = 0, cur = 1;
+        return {
+            next() {
+                [pre, cur] = [cur, pre + cur];
+                return { done: false, value: cur }
+            }
+        }
     }
-  }
 }
 
 for (var n of fibonacci) {
-  // truncate the sequence at 1000
-  if (n > 1000)
-    break;
-  console.log(n);
+    // 在1000处停止
+    if (n > 1000)
+        break;
+    console.log(n);
 }
 ```
 
-Iteration is based on these duck-typed interfaces (using [TypeScript](http://typescriptlang.org) type syntax for exposition only):
+迭代器是基于这些鸭子类型的接口（这里使用 [TypeScript](http://typescriptlang.org) 类型的语法只是用以阐述问题）：
 ```TypeScript
 interface IteratorResult {
-  done: boolean;
-  value: any;
+    done: boolean;
+    value: any;
 }
 interface Iterator {
-  next(): IteratorResult;
+    next(): IteratorResult;
 }
 interface Iterable {
-  [Symbol.iterator](): Iterator
+    [Symbol.iterator](): Iterator
 }
 ```
 
-More info: [MDN for...of](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of)
+更多信息：[MDN for...of](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/for...of)
 
 ### Generators
 Generators simplify iterator-authoring using `function*` and `yield`.  A function declared as function* returns a Generator instance.  Generators are subtypes of iterators which include additional  `next` and `throw`.  These enable values to flow back into the generator, so `yield` is an expression form which returns a value (or throws).
